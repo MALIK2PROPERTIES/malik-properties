@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MALIK PROPERTIES | Buy & Sell Property</title>
+<meta name="description" content="MALIK PROPERTIES - Buy, sell and find property. Submit your property enquiry online.">
+<style>
+:root{--navy:#10243a;--blue:#173f67;--gold:#d7a94b;--cream:#f6f3ed;--ink:#182433;--muted:#667487;--white:#fff;--line:#dce3ea}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f7f9fc;color:var(--ink)}
+header{background:linear-gradient(115deg,#0d2034,#1c527a);color:#fff;padding:22px max(5vw,20px);display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{font-size:25px;font-weight:800;letter-spacing:1.4px}.brand span{color:var(--gold)}.tag{font-size:12px;letter-spacing:2px;color:#dbe8f4;margin-top:5px}
+nav{display:flex;gap:10px;flex-wrap:wrap}nav a{color:#fff;text-decoration:none;padding:10px 14px;border:1px solid #ffffff55;border-radius:22px;font-size:13px}
+.hero{padding:62px max(5vw,20px);background:linear-gradient(90deg,#0c2239ed,#173e60c9),url('https://images.unsplash.com/photo-160059_runtime?auto=format&fit=crop&w=1800&q=85') center/cover;color:#fff}
+.hero h1{font-size:clamp(34px,5vw,58px);max-width:720px;margin:0 0 14px}.hero p{font-size:17px;line-height:1.6;color:#e3edf6;max-width:650px}.gold{color:var(--gold)}
+.wrap{max-width:1100px;margin:30px auto;padding:0 18px}.intro{text-align:center;margin:34px 0 22px}.intro h2{margin:0 0 8px;color:var(--navy)}.intro p{color:var(--muted);margin:0}
+.tabs{display:flex;gap:10px;justify-content:center;margin:24px 0;flex-wrap:wrap}.tab{border:0;padding:13px 28px;border-radius:30px;font-weight:700;cursor:pointer;background:#e6edf4;color:var(--navy)}.tab.active{background:var(--gold);color:#172536}
+.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:clamp(18px,4vw,34px);box-shadow:0 12px 35px #19334d0d}
+.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.field{display:flex;flex-direction:column;gap:7px}.field.full{grid-column:1/-1}label{font-size:13px;font-weight:700;color:#33465a}input,select,textarea{width:100%;padding:12px 13px;border:1px solid #cbd5df;border-radius:9px;font:inherit;background:#fff;color:#172536}textarea{min-height:90px;resize:vertical}input:focus,select:focus,textarea:focus{outline:2px solid #d7a94b66;border-color:var(--gold)}.hint{font-size:12px;color:var(--muted)}
+.submit{border:0;background:var(--navy);color:#fff;padding:14px 24px;border-radius:9px;font-weight:700;font-size:15px;cursor:pointer}.submit:hover{background:#214e76}.submit:disabled{opacity:.6;cursor:wait}
+.status{margin-top:14px;font-size:14px}.admin{display:none}.admin.show{display:block}.records{overflow:auto;margin-top:18px}table{border-collapse:collapse;width:100%;min-width:760px;font-size:13px}th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left}th{background:#eef3f8}.smallbtn{border:0;background:#e9eef4;padding:9px 12px;border-radius:7px;cursor:pointer}
+footer{margin-top:45px;background:#0d2034;color:#dbe5ee;padding:25px max(5vw,20px);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13px}
+@media(max-width:650px){.formgrid{grid-template-columns:1fr}.field.full{grid-column:auto}.hero{padding-top:45px;padding-bottom:45px}header{align-items:flex-start}}
+</style>
+</head>
+<body>
+<header>
+ <div><div class="brand">MALIK <span>PROPERTIES</span></div><div class="tag">BUY • SELL • INVEST</div></div>
+ <nav><a href="#enquiry">Submit Enquiry</a><a href="https://wa.me/917900820082" target="_blank" rel="noopener">WhatsApp: 7900820082</a><a href="#admin" id="adminNav">Admin</a></nav>
+</header>
+<section class="hero">
+ <h1>Find the right property.<br><span class="gold">Make your next move.</span></h1>
+ <p>Looking to buy or sell land, plots, houses or commercial property? Share your requirements with MALIK PROPERTIES and our team will get in touch.</p>
+</section>
+<main class="wrap" id="enquiry">
+ <div class="intro"><h2>Property Enquiry</h2><p>Select BUY if you want to purchase, or SELL if you want to list your property.</p></div>
+ <div class="tabs"><button class="tab active" id="buyTab" type="button">BUY PROPERTY</button><button class="tab" id="sellTab" type="button">SELL PROPERTY</button></div>
+ <section class="panel" id="buyPanel">
+  <h2>Buy Property</h2><p class="hint">Tell us what kind of property you are looking for.</p>
+  <form id="buyForm"><input type="hidden" name="intent" value="BUY">
+   <div class="formgrid">
+    <div class="field"><label>District *</label><input name="district" required placeholder="Enter district"></div>
+    <div class="field"><label>Tehsil</label><input name="tehsil" placeholder="Enter tehsil"></div>
+    <div class="field"><label>Village / Area</label><input name="village" placeholder="Village, locality or area"></div>
+    <div class="field"><label>Type of Property *</label><select name="property_type" required><option value="">Select property type</option><option>Agricultural Land</option><option>Residential Plot</option><option>House</option><option>Commercial Property</option><option>Industrial Land</option><option>Other</option></select></div>
+    <div class="field"><label>Required Area *</label><input name="area" type="number" min="0" step="any" required placeholder="Enter area"></div>
+    <div class="field"><label>Area Unit *</label><select name="area_unit" required><option value="">Select unit</option><option>Gaj</option><option>Bigha</option><option>Square Feet</option><option>Square Meter</option><option>Acres</option></select></div>
+    <div class="field"><label>Minimum Budget (₹)</label><input name="budget_min" type="number" min="0" placeholder="e.g. 500000"></div>
+    <div class="field"><label>Maximum Budget (₹) *</label><input name="budget_max" type="number" min="0" required placeholder="e.g. 2000000"></div>
+    <div class="field"><label>Your Name *</label><input name="name" required placeholder="Full name"></div>
+    <div class="field"><label>Mobile Number *</label><input name="mobile" type="tel" required pattern="[0-9+() -]{8,18}" placeholder="Mobile number"></div>
+    <div class="field"><label>WhatsApp Number</label><input name="whatsapp" type="tel" placeholder="If different from mobile"></div>
+    <div class="field"><label>Email Address</label><input name="email" type="email" placeholder="name@example.com"></div>
+    <div class="field full"><label>Full Address</label><textarea name="address" placeholder="Your address"></textarea></div>
+    <div class="field full"><label>Additional Requirements</label><textarea name="details" placeholder="Any other details about the property you want to buy"></textarea></div>
+   </div><p style="margin-top:20px"><button class="submit" type="submit">Submit Buy Enquiry</button></p><div class="status" id="buyStatus" role="status"></div>
+  </form>
+ </section>
+ <section class="panel" id="sellPanel" style="display:none">
+  <h2>Sell Property</h2><p class="hint">Share your property details. Gata / Khasra number is required for land/property identification.</p>
+  <form id="sellForm"><input type="hidden" name="intent" value="SELL">
+   <div class="formgrid">
+    <div class="field"><label>District *</label><input name="district" required placeholder="Enter district"></div>
+    <div class="field"><label>Tehsil *</label><input name="tehsil" required placeholder="Enter tehsil"></div>
+    <div class="field"><label>Village / Area *</label><input name="village" required placeholder="Village or locality"></div>
+    <div class="field"><label>Type of Property *</label><select name="property_type" required><option value="">Select property type</option><option>Agricultural Land</option><option>Residential Plot</option><option>House</option><option>Commercial Property</option><option>Industrial Land</option><option>Other</option></select></div>
+    <div class="field"><label>Property Area *</label><input name="area" type="number" min="0" step="any" required placeholder="Enter area"></div>
+    <div class="field"><label>Area Unit *</label><select name="area_unit" required><option value="">Select unit</option><option>Gaj</option><option>Bigha</option><option>Square Feet</option><option>Square Meter</option><option>Acres</option></select></div>
+    <div class="field"><label>Gata Number *</label><input name="gata_no" required placeholder="Enter Gata number"></div>
+    <div class="field"><label>Khasra Number *</label><input name="khasra_no" required placeholder="Enter Khasra number"></div>
+    <div class="field"><label>Expected Selling Price (₹) *</label><input name="asking_price" type="number" min="0" required placeholder="Expected price"></div>
+    <div class="field"><label>Price Negotiable?</label><select name="negotiable"><option>Yes</option><option>No</option></select></div>
+    <div class="field"><label>Owner Name *</label><input name="name" required placeholder="Full name"></div>
+    <div class="field"><label>Mobile Number *</label><input name="mobile" type="tel" required pattern="[0-9+() -]{8,18}" placeholder="Mobile number"></div>
+    <div class="field"><label>WhatsApp Number</label><input name="whatsapp" type="tel" placeholder="If different from mobile"></div>
+    <div class="field"><label>Email Address</label><input name="email" type="email" placeholder="name@example.com"></div>
+    <div class="field full"><label>Property Location / Full Address *</label><textarea name="address" required placeholder="Complete property location and your address"></textarea></div>
+    <div class="field full"><label>Additional Property Details</label><textarea name="details" placeholder="Road access, ownership details, nearby landmark, etc."></textarea></div>
+   </div><p style="margin-top:20px"><button class="submit" type="submit">Submit Sell Enquiry</button></p><div class="status" id="sellStatus" role="status"></div>
+  </form>
+ </section>
+ <section class="panel admin" id="admin" style="margin-top:30px">
+  <h2>Admin Panel</h2><p class="hint">Sign in with the admin account created in your Supabase project.</p>
+  <form id="loginForm"><div class="formgrid"><div class="field"><label>Admin Email</label><input name="email" type="email" required></div><div class="field"><label>Password</label><input name="password" type="password" required></div></div><p><button class="submit" type="submit">Admin Login</button></p></form>
+  <div id="adminArea" style="display:none"><button class="smallbtn" id="refreshBtn">Refresh Enquiries</button> <button class="smallbtn" id="logoutBtn">Logout</button><div class="records" id="records"></div></div><div class="status" id="adminStatus"></div>
+ </section>
+</main>
+<footer><div><strong>MALIK PROPERTIES</strong><br>Property Sale & Purchase</div><div>WhatsApp / Contact: <a style="color:#f0c66e" href="https://wa.me/917900820082">7900820082</a></div><div>© <span id="year"></span> MALIK PROPERTIES</div></footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// Add your Supabase Project URL and anon/publishable key below before publishing.
+const SUPABASE_URL = "https://akajbjwkclcwdvibarah.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_hucx_5vuS6NAwEa-oiAs2Q_41fzox44";
+const TABLE = "property_enquiries";
+let db = null, currentUser = null;
+if (window.supabase && SUPABASE_URL.startsWith("https://") && !SUPABASE_ANON_KEY.startsWith("PASTE_")) {
+  db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+document.getElementById("year").textContent = new Date().getFullYear();
+const buyTab=document.getElementById("buyTab"), sellTab=document.getElementById("sellTab");
+function showForm(which){const buy=which==="buy";document.getElementById("buyPanel").style.display=buy?"block":"none";document.getElementById("sellPanel").style.display=buy?"none":"block";buyTab.classList.toggle("active",buy);sellTab.classList.toggle("active",!buy)}
+buyTab.onclick=()=>showForm("buy");sellTab.onclick=()=>showForm("sell");
+document.getElementById("adminNav").addEventListener("click",()=>document.getElementById("admin").classList.add("show"));
+function formData(form){const out={};new FormData(form).forEach((v,k)=>{if(k!=="intent")out[k]=String(v).trim()});return out}
+async function submitEnquiry(form,intent,statusId){
+ const status=document.getElementById(statusId),btn=form.querySelector("button[type=submit]");
+ if(!db){status.textContent="Website database is not connected yet. Add your Supabase URL and anon key in this file, then publish again.";status.style.color="#b45309";return}
+ btn.disabled=true;status.textContent="Submitting…";status.style.color="#334155";
+ const payload={intent, ...formData(form), created_at:new Date().toISOString()};
+ const {error}=await db.from(TABLE).insert([payload]);
+ btn.disabled=false;
+ if(error){status.textContent="Could not submit: "+error.message;status.style.color="#b91c1c";return}
+ status.textContent="Thank you! Your enquiry has been submitted successfully.";status.style.color="#15803d";form.reset();
+}
+document.getElementById("buyForm").addEventListener("submit",e=>{e.preventDefault();submitEnquiry(e.target,"BUY","buyStatus")});
+document.getElementById("sellForm").addEventListener("submit",e=>{e.preventDefault();submitEnquiry(e.target,"SELL","sellStatus")});
+document.getElementById("loginForm").addEventListener("submit",async e=>{
+ e.preventDefault();const s=document.getElementById("adminStatus");
+ if(!db){s.textContent="Database is not connected. Configure Supabase URL and anon key first.";return}
+ const f=new FormData(e.target);const {data,error}=await db.auth.signInWithPassword({email:f.get("email"),password:f.get("password")});
+ if(error){s.textContent="Login failed: "+error.message;return}currentUser=data.user;document.getElementById("adminArea").style.display="block";s.textContent="Logged in.";await loadRecords();
+});
+async function loadRecords(){
+ const target=document.getElementById("records");target.textContent="Loading…";
+ const {data,error}=await db.from(TABLE).select("*").order("created_at",{ascending:false}).limit(300);
+ if(error){target.textContent="Could not load enquiries: "+error.message;return}
+ if(!data.length){target.textContent="No enquiries received yet.";return}
+ const cols=["created_at","intent","name","mobile","district","property_type","area","area_unit","gata_no","khasra_no","budget_max","asking_price","email"];
+ const table=document.createElement("table"),thead=document.createElement("thead"),tr=document.createElement("tr");
+ cols.forEach(c=>{const th=document.createElement("th");th.textContent=c.replaceAll("_"," ").toUpperCase();tr.appendChild(th)});thead.appendChild(tr);table.appendChild(thead);
+ const tbody=document.createElement("tbody");data.forEach(row=>{const r=document.createElement("tr");cols.forEach(c=>{const td=document.createElement("td");td.textContent=row[c]??"";r.appendChild(td)});tbody.appendChild(r)});table.appendChild(tbody);target.replaceChildren(table);
+}
+document.getElementById("refreshBtn").onclick=loadRecords;
+document.getElementById("logoutBtn").onclick=async()=>{await db.auth.signOut();document.getElementById("adminArea").style.display="none";document.getElementById("adminStatus").textContent="Logged out."};
+</script>
+</body></html>
