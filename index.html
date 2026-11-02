@@ -203,11 +203,7 @@ tbody.appendChild(r);
  });
  table.appendChild(tbody);target.replaceChildren(table);
 }
-async function loadRecords(){
- const target=document.getElementById("records");target.textContent="Loading…";
- const {data,error}=await db.from(TABLE).select("*").order("created_at",{ascending:false}).limit(300);
- if(error){target.textContent="Could not load enquiries: "+error.message;return}
-async function deleteEnquiry(id, button) {
+ async function deleteEnquiry(id, button) {
   if (!currentUser) {
     alert("Please login as admin first.");
     return;
@@ -233,7 +229,23 @@ async function deleteEnquiry(id, button) {
   renderRecords();
   alert("Enquiry successfully deleted.");
 }
- allRecords=data||[];renderRecords();
+
+async function loadRecords() {
+  const target = document.getElementById("records");
+  target.textContent = "Loading…";
+
+  const { data, error } = await db.from(TABLE)
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(300);
+
+  if (error) {
+    target.textContent = "Could not load enquiries: " + error.message;
+    return;
+  }
+
+  allRecords = data || [];
+  renderRecords();
 }
 ["searchInput","intentFilter","statusFilter"].forEach(id=>document.getElementById(id).addEventListener(id==="searchInput"?"input":"change",renderRecords));
 document.getElementById("refreshBtn").onclick=loadRecords;
