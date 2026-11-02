@@ -17,7 +17,7 @@ nav{display:flex;gap:10px;flex-wrap:wrap}nav a{color:#fff;text-decoration:none;p
 .panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:clamp(18px,4vw,34px);box-shadow:0 12px 35px #19334d0d}
 .formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.field{display:flex;flex-direction:column;gap:7px}.field.full{grid-column:1/-1}label{font-size:13px;font-weight:700;color:#33465a}input,select,textarea{width:100%;padding:12px 13px;border:1px solid #cbd5df;border-radius:9px;font:inherit;background:#fff;color:#172536}textarea{min-height:90px;resize:vertical}input:focus,select:focus,textarea:focus{outline:2px solid #d7a94b66;border-color:var(--gold)}.hint{font-size:12px;color:var(--muted)}
 .submit{border:0;background:var(--navy);color:#fff;padding:14px 24px;border-radius:9px;font-weight:700;font-size:15px;cursor:pointer}.submit:hover{background:#214e76}.submit:disabled{opacity:.6;cursor:wait}
-.status{margin-top:14px;font-size:14px}.admin{display:none}.admin.show{display:block}.records{overflow:auto;margin-top:18px}table{border-collapse:collapse;width:100%;min-width:760px;font-size:13px}th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left}th{background:#eef3f8}.smallbtn{border:0;background:#e9eef4;padding:9px 12px;border-radius:7px;cursor:pointer}
+.status{margin-top:14px;font-size:14px}.admin{display:none}.admin.show{display:block}.records{overflow:auto;margin-top:18px}table{border-collapse:collapse;width:100%;min-width:760px;font-size:13px}th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left}th{background:#eef3f8}.smallbtn{border:0;background:#e9eef4;padding:9px 12px;border-radius:7px;cursor:pointer}.adminFilters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin-top:16px}.adminFilters input,.adminFilters select{min-width:0}@media(max-width:650px){.adminFilters{grid-template-columns:1fr}}
 footer{margin-top:45px;background:#0d2034;color:#dbe5ee;padding:25px max(5vw,20px);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13px}
 @media(max-width:650px){.formgrid{grid-template-columns:1fr}.field.full{grid-column:auto}.hero{padding-top:45px;padding-bottom:45px}header{align-items:flex-start}}
 </style>
@@ -81,7 +81,7 @@ footer{margin-top:45px;background:#0d2034;color:#dbe5ee;padding:25px max(5vw,20p
  <section class="panel admin" id="admin" style="margin-top:30px">
   <h2>Admin Panel</h2><p class="hint">Sign in with the admin account created in your Supabase project.</p>
   <form id="loginForm"><div class="formgrid"><div class="field"><label>Admin Email</label><input name="email" type="email" required></div><div class="field"><label>Password</label><input name="password" type="password" required></div></div><p><button class="submit" type="submit">Admin Login</button></p></form>
-  <div id="adminArea" style="display:none"><button class="smallbtn" id="refreshBtn">Refresh Enquiries</button> <button class="smallbtn" id="logoutBtn">Logout</button><div class="records" id="records"></div></div><div class="status" id="adminStatus"></div>
+  <div id="adminArea" style="display:none"><button class="smallbtn" id="refreshBtn">Refresh Enquiries</button> <button class="smallbtn" id="logoutBtn">Logout</button><div class="adminFilters"><input id="searchInput" type="search" placeholder="Search name, mobile, district..." aria-label="Search enquiries"><select id="intentFilter" aria-label="Filter by enquiry type"><option value="ALL">All Enquiries (BUY + SELL)</option><option value="BUY">BUY Only</option><option value="SELL">SELL Only</option></select><select id="statusFilter" aria-label="Filter by status"><option value="ALL">All Statuses</option><option>Pending</option><option>Contacted</option><option>Completed</option><option>Rejected</option></select></div><div class="records" id="records"></div></div><div class="status" id="adminStatus"></div>
  </section>
 </main>
 <footer><div><strong>MALIK PROPERTIES</strong><br>Property Sale & Purchase</div><div>WhatsApp / Contact: <a style="color:#f0c66e" href="https://wa.me/917900820082">7900820082</a></div><div>© <span id="year"></span> MALIK PROPERTIES</div></footer>
@@ -137,33 +137,42 @@ async function updateEnquiryStatus(id, newStatus, statusCell, statusSelect){
  feedback.textContent="Saved";
  feedback.style.color="#15803d";
 }
-async function loadRecords(){
- const target=document.getElementById("records");target.textContent="Loading…";
- const {data,error}=await db.from(TABLE).select("*").order("created_at",{ascending:false}).limit(300);
- if(error){target.textContent="Could not load enquiries: "+error.message;return}
- if(!data.length){target.textContent="No enquiries received yet.";return}
+let allRecords=[];
+function renderRecords(){
+ const target=document.getElementById("records");
+ const term=(document.getElementById("searchInput").value||"").trim().toLowerCase();
+ const intent=document.getElementById("intentFilter").value;
+ const status=document.getElementById("statusFilter").value;
+ const filtered=allRecords.filter(row=>{
+   const searchable=[row.name,row.mobile,row.whatsapp,row.district,row.tehsil,row.village,row.email,row.property_type].join(" ").toLowerCase();
+   return (!term||searchable.includes(term))&&(intent==="ALL"||row.intent===intent)&&(status==="ALL"||(row.status||"Pending")===status);
+ });
+ if(!filtered.length){target.textContent=allRecords.length?"No enquiries match these filters.":"No enquiries received yet.";return}
  const cols=["created_at","intent","name","mobile","district","property_type","area","area_unit","gata_no","khasra_no","budget_max","asking_price","email"];
  const table=document.createElement("table"),thead=document.createElement("thead"),tr=document.createElement("tr");
  cols.forEach(c=>{const th=document.createElement("th");th.textContent=c.replaceAll("_"," ").toUpperCase();tr.appendChild(th)});
  const statusHead=document.createElement("th");statusHead.textContent="STATUS";tr.appendChild(statusHead);
  thead.appendChild(tr);table.appendChild(thead);
  const tbody=document.createElement("tbody");
- data.forEach(row=>{
+ filtered.forEach(row=>{
    const r=document.createElement("tr");
    cols.forEach(c=>{const td=document.createElement("td");td.textContent=row[c]??"";r.appendChild(td)});
    const statusCell=document.createElement("td");
    const statusSelect=document.createElement("select");
-   ["Pending","Contacted","Completed","Rejected"].forEach(value=>{
-     const option=document.createElement("option");option.value=value;option.textContent=value;statusSelect.appendChild(option);
-   });
+   ["Pending","Contacted","Completed","Rejected"].forEach(value=>{const option=document.createElement("option");option.value=value;option.textContent=value;statusSelect.appendChild(option)});
    statusSelect.value=row.status||"Pending";
-   statusSelect.addEventListener("change",()=>updateEnquiryStatus(row.id,statusSelect.value,statusCell,statusSelect));
-   statusCell.appendChild(statusSelect);
-   r.appendChild(statusCell);
-   tbody.appendChild(r);
+   statusSelect.addEventListener("change",async()=>{await updateEnquiryStatus(row.id,statusSelect.value,statusCell,statusSelect);if(!statusSelect.disabled){row.status=statusSelect.value;}});
+   statusCell.appendChild(statusSelect);r.appendChild(statusCell);tbody.appendChild(r);
  });
  table.appendChild(tbody);target.replaceChildren(table);
 }
+async function loadRecords(){
+ const target=document.getElementById("records");target.textContent="Loading…";
+ const {data,error}=await db.from(TABLE).select("*").order("created_at",{ascending:false}).limit(300);
+ if(error){target.textContent="Could not load enquiries: "+error.message;return}
+ allRecords=data||[];renderRecords();
+}
+["searchInput","intentFilter","statusFilter"].forEach(id=>document.getElementById(id).addEventListener(id==="searchInput"?"input":"change",renderRecords));
 document.getElementById("refreshBtn").onclick=loadRecords;
 document.getElementById("logoutBtn").onclick=async()=>{await db.auth.signOut();document.getElementById("adminArea").style.display="none";document.getElementById("adminStatus").textContent="Logged out."};
 </script>
