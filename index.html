@@ -20,6 +20,24 @@ nav{display:flex;gap:10px;flex-wrap:wrap}nav a{color:#fff;text-decoration:none;p
 .status{margin-top:14px;font-size:14px}.admin{display:none}.admin.show{display:block}.records{overflow:auto;margin-top:18px}table{border-collapse:collapse;width:100%;min-width:760px;font-size:13px}th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left}th{background:#eef3f8}.smallbtn{border:0;background:#e9eef4;padding:9px 12px;border-radius:7px;cursor:pointer}.adminFilters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin-top:16px}.adminFilters input,.adminFilters select{min-width:0}@media(max-width:650px){.adminFilters{grid-template-columns:1fr}}
 footer{margin-top:45px;background:#0d2034;color:#dbe5ee;padding:25px max(5vw,20px);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13px}
 @media(max-width:650px){.formgrid{grid-template-columns:1fr}.field.full{grid-column:auto}.hero{padding-top:45px;padding-bottom:45px}header{align-items:flex-start}}
+.deletebtn {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.deletebtn:hover {
+  background: #991b1b;
+}
+
+.deletebtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 </style>
 </head>
 <body>
@@ -170,6 +188,32 @@ async function loadRecords(){
  const target=document.getElementById("records");target.textContent="Loading…";
  const {data,error}=await db.from(TABLE).select("*").order("created_at",{ascending:false}).limit(300);
  if(error){target.textContent="Could not load enquiries: "+error.message;return}
+async function deleteEnquiry(id, button) {
+  if (!currentUser) {
+    alert("Please login as admin first.");
+    return;
+  }
+
+  if (!confirm("Kya aap is enquiry ko permanently delete karna chahte hain?")) {
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "Deleting...";
+
+  const { error } = await db.from(TABLE).delete().eq("id", id);
+
+  if (error) {
+    button.disabled = false;
+    button.textContent = "Delete";
+    alert("Delete failed: " + error.message);
+    return;
+  }
+
+  allRecords = allRecords.filter(row => String(row.id) !== String(id));
+  renderRecords();
+  alert("Enquiry successfully deleted.");
+}
  allRecords=data||[];renderRecords();
 }
 ["searchInput","intentFilter","statusFilter"].forEach(id=>document.getElementById(id).addEventListener(id==="searchInput"?"input":"change",renderRecords));
