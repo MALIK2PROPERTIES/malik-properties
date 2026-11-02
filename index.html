@@ -119,6 +119,19 @@ document.getElementById("loginForm").addEventListener("submit",async e=>{
  const f=new FormData(e.target);const {data,error}=await db.auth.signInWithPassword({email:f.get("email"),password:f.get("password")});
  if(error){s.textContent="Login failed: "+error.message;return}currentUser=data.user;document.getElementById("adminArea").style.display="block";s.textContent="Logged in.";await loadRecords();
 });
+async function updateEnquiryStatus(id, newStatus, statusCell){
+ const allowed=["Pending","Contacted","Completed","Rejected"];
+ if(!allowed.includes(newStatus)) return;
+ statusCell.textContent="Saving…";
+ const {error}=await db.from(TABLE).update({status:newStatus}).eq("id",id);
+ if(error){
+   statusCell.textContent="Save failed: "+error.message;
+   statusCell.style.color="#b91c1c";
+   return;
+ }
+ statusCell.textContent="Saved: "+newStatus;
+ statusCell.style.color="#15803d";
+}
 async function loadRecords(){
  const target=document.getElementById("records");target.textContent="Loading…";
  const {data,error}=await db.from(TABLE).select("*").order("created_at",{ascending:false}).limit(300);
@@ -126,8 +139,25 @@ async function loadRecords(){
  if(!data.length){target.textContent="No enquiries received yet.";return}
  const cols=["created_at","intent","name","mobile","district","property_type","area","area_unit","gata_no","khasra_no","budget_max","asking_price","email"];
  const table=document.createElement("table"),thead=document.createElement("thead"),tr=document.createElement("tr");
- cols.forEach(c=>{const th=document.createElement("th");th.textContent=c.replaceAll("_"," ").toUpperCase();tr.appendChild(th)});thead.appendChild(tr);table.appendChild(thead);
- const tbody=document.createElement("tbody");data.forEach(row=>{const r=document.createElement("tr");cols.forEach(c=>{const td=document.createElement("td");td.textContent=row[c]??"";r.appendChild(td)});tbody.appendChild(r)});table.appendChild(tbody);target.replaceChildren(table);
+ cols.forEach(c=>{const th=document.createElement("th");th.textContent=c.replaceAll("_"," ").toUpperCase();tr.appendChild(th)});
+ const statusHead=document.createElement("th");statusHead.textContent="STATUS";tr.appendChild(statusHead);
+ thead.appendChild(tr);table.appendChild(thead);
+ const tbody=document.createElement("tbody");
+ data.forEach(row=>{
+   const r=document.createElement("tr");
+   cols.forEach(c=>{const td=document.createElement("td");td.textContent=row[c]??"";r.appendChild(td)});
+   const statusCell=document.createElement("td");
+   const statusSelect=document.createElement("select");
+   ["Pending","Contacted","Completed","Rejected"].forEach(value=>{
+     const option=document.createElement("option");option.value=value;option.textContent=value;statusSelect.appendChild(option);
+   });
+   statusSelect.value=row.status||"Pending";
+   statusSelect.addEventListener("change",()=>updateEnquiryStatus(row.id,statusSelect.value,statusCell));
+   statusCell.appendChild(statusSelect);
+   r.appendChild(statusCell);
+   tbody.appendChild(r);
+ });
+ table.appendChild(tbody);target.replaceChildren(table);
 }
 document.getElementById("refreshBtn").onclick=loadRecords;
 document.getElementById("logoutBtn").onclick=async()=>{await db.auth.signOut();document.getElementById("adminArea").style.display="none";document.getElementById("adminStatus").textContent="Logged out."};
