@@ -170,6 +170,9 @@ function renderRecords(){
  const table=document.createElement("table"),thead=document.createElement("thead"),tr=document.createElement("tr");
  cols.forEach(c=>{const th=document.createElement("th");th.textContent=c.replaceAll("_"," ").toUpperCase();tr.appendChild(th)});
  const statusHead=document.createElement("th");statusHead.textContent="STATUS";tr.appendChild(statusHead);
+const actionHead=document.createElement("th");
+actionHead.textContent="ACTION";
+tr.appendChild(actionHead);
  thead.appendChild(tr);table.appendChild(thead);
  const tbody=document.createElement("tbody");
  filtered.forEach(row=>{
@@ -180,7 +183,23 @@ function renderRecords(){
    ["Pending","Contacted","Completed","Rejected"].forEach(value=>{const option=document.createElement("option");option.value=value;option.textContent=value;statusSelect.appendChild(option)});
    statusSelect.value=row.status||"Pending";
    statusSelect.addEventListener("change",async()=>{await updateEnquiryStatus(row.id,statusSelect.value,statusCell,statusSelect);if(!statusSelect.disabled){row.status=statusSelect.value;}});
-   statusCell.appendChild(statusSelect);r.appendChild(statusCell);tbody.appendChild(r);
+   statusCell.appendChild(statusSelect);
+r.appendChild(statusCell);
+
+const actionCell=document.createElement("td");
+const deleteBtn=document.createElement("button");
+deleteBtn.type="button";
+deleteBtn.className="deletebtn";
+deleteBtn.textContent="Delete";
+
+deleteBtn.addEventListener("click",()=>{
+  deleteEnquiry(row.id,deleteBtn);
+});
+
+actionCell.appendChild(deleteBtn);
+r.appendChild(actionCell);
+
+tbody.appendChild(r);
  });
  table.appendChild(tbody);target.replaceChildren(table);
 }
