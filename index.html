@@ -119,18 +119,23 @@ document.getElementById("loginForm").addEventListener("submit",async e=>{
  const f=new FormData(e.target);const {data,error}=await db.auth.signInWithPassword({email:f.get("email"),password:f.get("password")});
  if(error){s.textContent="Login failed: "+error.message;return}currentUser=data.user;document.getElementById("adminArea").style.display="block";s.textContent="Logged in.";await loadRecords();
 });
-async function updateEnquiryStatus(id, newStatus, statusCell){
+async function updateEnquiryStatus(id, newStatus, statusCell, statusSelect){
  const allowed=["Pending","Contacted","Completed","Rejected"];
  if(!allowed.includes(newStatus)) return;
- statusCell.textContent="Saving…";
+ let feedback=statusCell.querySelector(".statusFeedback");
+ if(!feedback){feedback=document.createElement("small");feedback.className="statusFeedback";feedback.style.display="block";statusCell.appendChild(feedback);}
+ feedback.textContent="Saving…";
+ feedback.style.color="#555";
+ statusSelect.disabled=true;
  const {error}=await db.from(TABLE).update({status:newStatus}).eq("id",id);
+ statusSelect.disabled=false;
  if(error){
-   statusCell.textContent="Save failed: "+error.message;
-   statusCell.style.color="#b91c1c";
+   feedback.textContent="Save failed: "+error.message;
+   feedback.style.color="#b91c1c";
    return;
  }
- statusCell.textContent="Saved: "+newStatus;
- statusCell.style.color="#15803d";
+ feedback.textContent="Saved";
+ feedback.style.color="#15803d";
 }
 async function loadRecords(){
  const target=document.getElementById("records");target.textContent="Loading…";
@@ -152,7 +157,7 @@ async function loadRecords(){
      const option=document.createElement("option");option.value=value;option.textContent=value;statusSelect.appendChild(option);
    });
    statusSelect.value=row.status||"Pending";
-   statusSelect.addEventListener("change",()=>updateEnquiryStatus(row.id,statusSelect.value,statusCell));
+   statusSelect.addEventListener("change",()=>updateEnquiryStatus(row.id,statusSelect.value,statusCell,statusSelect));
    statusCell.appendChild(statusSelect);
    r.appendChild(statusCell);
    tbody.appendChild(r);
