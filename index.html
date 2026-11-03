@@ -120,7 +120,6 @@ document.getElementById("year").textContent = new Date().getFullYear();
 const buyTab=document.getElementById("buyTab"), sellTab=document.getElementById("sellTab");
 function showForm(which){const buy=which==="buy";document.getElementById("buyPanel").style.display=buy?"block":"none";document.getElementById("sellPanel").style.display=buy?"none":"block";buyTab.classList.toggle("active",buy);sellTab.classList.toggle("active",!buy)}
 buyTab.onclick=()=>showForm("buy");sellTab.onclick=()=>showForm("sell");
-document.getElementById("adminNav").addEventListener("click",()=>document.getElementById("admin").classList.add("show"));
 function formData(form){const out={};new FormData(form).forEach((v,k)=>{if(k!=="intent")out[k]=String(v).trim()});return out}
 async function submitEnquiry(form,intent,statusId){
  const status=document.getElementById(statusId),btn=form.querySelector("button[type=submit]");
