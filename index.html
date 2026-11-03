@@ -99,7 +99,7 @@ footer{margin-top:45px;background:#0d2034;color:#dbe5ee;padding:25px max(5vw,20p
    </div><p style="margin-top:20px"><button class="submit" type="submit">Submit Sell Enquiry</button></p><div class="status" id="sellStatus" role="status"></div>
   </form>
  </section>
- <section class="panel admin" id="admin" style="margin-top:30px">
+ <section class="panel admin" id="admin" style="display:none;margin-top:30px">
   <h2>Admin Panel</h2><p class="hint">Sign in with the admin account created in your Supabase project.</p>
   <form id="loginForm"><div class="formgrid"><div class="field"><label>Admin Email</label><input name="email" type="email" required></div><div class="field"><label>Password</label><input name="password" type="password" required></div></div><p><button class="submit" type="submit">Admin Login</button></p></form>
   <div id="adminArea" style="display:none"><button class="smallbtn" id="refreshBtn">Refresh Enquiries</button> <button class="smallbtn" id="logoutBtn">Logout</button><div class="adminFilters"><input id="searchInput" type="search" placeholder="Search name, mobile, district..." aria-label="Search enquiries"><select id="intentFilter" aria-label="Filter by enquiry type"><option value="ALL">All Enquiries (BUY + SELL)</option><option value="BUY">BUY Only</option><option value="SELL">SELL Only</option></select><select id="statusFilter" aria-label="Filter by status"><option value="ALL">All Statuses</option><option>Pending</option><option>Contacted</option><option>Completed</option><option>Rejected</option></select></div><div class="records" id="records"></div></div><div class="status" id="adminStatus"></div>
