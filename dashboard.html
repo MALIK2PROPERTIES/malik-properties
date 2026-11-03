@@ -1,0 +1,241 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MALIK PROPERTIES - Admin Dashboard</title>
+<style>
+body{margin:0;font-family:Arial;background:#f3f6fa;color:#182433}
+header{background:#10243a;color:white;padding:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+main{max-width:1200px;margin:25px auto;padding:15px}
+.panel{background:white;padding:20px;border-radius:12px;box-shadow:0 5px 20px #0000000d}
+button,select,input{padding:10px;border:1px solid #ccd5df;border-radius:6px}
+button{cursor:pointer}
+.logout{background:#dc2626;color:white;border:0}
+.refresh{background:#10243a;color:white;border:0}
+.filters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin:18px 0}
+.filters input,.filters select{width:100%;box-sizing:border-box}
+.records{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:950px;font-size:13px}
+th,td{padding:11px;border-bottom:1px solid #ddd;text-align:left}
+th{background:#eaf0f6}
+.deletebtn{background:#dc2626;color:white;border:0}
+#msg{margin:12px 0}
+@media(max-width:650px){.filters{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+<h2>MALIK PROPERTIES | ADMIN</h2>
+<button class="logout" id="logoutBtn">Logout</button>
+</header>
+
+<main>
+<section class="panel">
+<h2>Property Enquiries</h2>
+
+<button class="refresh" id="refreshBtn">Refresh Enquiries</button>
+
+<div class="filters">
+<input id="searchInput" type="search" placeholder="Search name, mobile, district...">
+
+<select id="intentFilter">
+<option value="ALL">All Enquiries</option>
+<option value="BUY">BUY Only</option>
+<option value="SELL">SELL Only</option>
+</select>
+
+<select id="statusFilter">
+<option value="ALL">All Statuses</option>
+<option>Pending</option>
+<option>Contacted</option>
+<option>Completed</option>
+<option>Rejected</option>
+</select>
+</div>
+
+<div id="msg">Loading enquiries...</div>
+<div class="records" id="records"></div>
+</section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://nuczhymryojulcsitjvn.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_7IpV4y5OgLvdHRPOTa3_Ng_5QRsv59G";
+const TABLE="property_enquiries";
+
+const db=window.supabase.createClient(
+SUPABASE_URL,SUPABASE_ANON_KEY
+);
+
+let allRecords=[];
+
+async function checkLogin(){
+const {data,error}=await db.auth.getSession();
+
+if(error || !data.session){
+window.location.href="admin.html";
+return false;
+}
+return true;
+}
+
+async function loadRecords(){
+if(!await checkLogin())return;
+
+const target=document.getElementById("records");
+document.getElementById("msg").textContent="Loading...";
+
+const {data,error}=await db.from(TABLE)
+.select("*")
+.order("created_at",{ascending:false})
+.limit(300);
+
+if(error){
+document.getElementById("msg").textContent="Error: "+error.message;
+return;
+}
+
+allRecords=data||[];
+document.getElementById("msg").textContent=
+"Total Enquiries: "+allRecords.length;
+
+renderRecords();
+}
+
+function renderRecords(){
+const target=document.getElementById("records");
+const term=document.getElementById("searchInput").value.trim().toLowerCase();
+const intent=document.getElementById("intentFilter").value;
+const status=document.getElementById("statusFilter").value;
+
+const filtered=allRecords.filter(row=>{
+const search=[
+row.name,row.mobile,row.whatsapp,row.district,
+row.tehsil,row.village,row.email,row.property_type
+].join(" ").toLowerCase();
+
+return (!term||search.includes(term))
+&& (intent==="ALL"||row.intent===intent)
+&& (status==="ALL"||(row.status||"Pending")===status);
+});
+
+if(!filtered.length){
+target.textContent="No enquiries found.";
+return;
+}
+
+const cols=[
+"created_at","intent","name","mobile","district",
+"property_type","area","area_unit","gata_no",
+"khasra_no","budget_max","asking_price","email"
+];
+
+const table=document.createElement("table");
+const thead=document.createElement("thead");
+const head=document.createElement("tr");
+
+[...cols,"STATUS","ACTION"].forEach(c=>{
+const th=document.createElement("th");
+th.textContent=c.replaceAll("_"," ").toUpperCase();
+head.appendChild(th);
+});
+
+thead.appendChild(head);
+table.appendChild(thead);
+
+const tbody=document.createElement("tbody");
+
+filtered.forEach(row=>{
+const tr=document.createElement("tr");
+
+cols.forEach(c=>{
+const td=document.createElement("td");
+td.textContent=row[c]??"";
+tr.appendChild(td);
+});
+
+const statusCell=document.createElement("td");
+const select=document.createElement("select");
+
+["Pending","Contacted","Completed","Rejected"].forEach(s=>{
+const op=document.createElement("option");
+op.value=s;
+op.textContent=s;
+select.appendChild(op);
+});
+
+select.value=row.status||"Pending";
+
+select.addEventListener("change",async()=>{
+select.disabled=true;
+const newStatus=select.value;
+
+const {error}=await db.from(TABLE)
+.update({status:newStatus}).eq("id",row.id);
+
+select.disabled=false;
+
+if(error){
+alert("Status update failed: "+error.message);
+select.value=row.status||"Pending";
+}else{
+row.status=newStatus;
+}
+});
+
+statusCell.appendChild(select);
+tr.appendChild(statusCell);
+
+const action=document.createElement("td");
+const del=document.createElement("button");
+del.textContent="Delete";
+del.className="deletebtn";
+
+del.onclick=async()=>{
+if(!confirm("Permanently delete this enquiry?"))return;
+
+del.disabled=true;
+const {error}=await db.from(TABLE)
+.delete().eq("id",row.id);
+
+if(error){
+alert("Delete failed: "+error.message);
+del.disabled=false;
+}else{
+allRecords=allRecords.filter(x=>String(x.id)!==String(row.id));
+renderRecords();
+}
+};
+
+action.appendChild(del);
+tr.appendChild(action);
+tbody.appendChild(tr);
+});
+
+table.appendChild(tbody);
+target.replaceChildren(table);
+}
+
+document.getElementById("refreshBtn").onclick=loadRecords;
+
+["searchInput","intentFilter","statusFilter"].forEach(id=>{
+document.getElementById(id).addEventListener(
+id==="searchInput"?"input":"change",renderRecords
+);
+});
+
+document.getElementById("logoutBtn").onclick=async()=>{
+await db.auth.signOut();
+window.location.href="admin.html";
+};
+
+checkLogin().then(ok=>{
+if(ok)loadRecords();
+});
+</script>
+</body>
+</html>

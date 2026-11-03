@@ -1,0 +1,60 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MALIK PROPERTIES - Admin Login</title>
+<style>
+body{margin:0;font-family:Arial;background:#10243a;min-height:100vh;display:flex;align-items:center;justify-content:center}
+.box{background:white;padding:35px;border-radius:15px;width:90%;max-width:380px;box-sizing:border-box}
+h2{text-align:center;color:#10243a}
+input{width:100%;padding:13px;margin:10px 0;box-sizing:border-box;border:1px solid #ccc;border-radius:7px}
+button{width:100%;padding:14px;background:#10243a;color:white;border:0;border-radius:7px;font-weight:bold;cursor:pointer}
+#msg{font-size:14px;text-align:center}
+</style>
+</head>
+<body>
+<div class="box">
+<h2>MALIK PROPERTIES</h2>
+<p style="text-align:center">Admin Login</p>
+
+<form id="loginForm">
+<input type="email" id="email" placeholder="Admin Email" required>
+<input type="password" id="password" placeholder="Password" required>
+<button type="submit">LOGIN</button>
+</form>
+<p id="msg"></p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://nuczhymryojulcsitjvn.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_7IpV4y5OgLvdHRPOTa3_Ng_5QRsv59G";
+
+const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+document.getElementById("loginForm").addEventListener("submit",async function(e){
+e.preventDefault();
+
+const msg=document.getElementById("msg");
+const btn=this.querySelector("button");
+btn.disabled=true;
+msg.textContent="Checking login...";
+
+const {data,error}=await db.auth.signInWithPassword({
+email:document.getElementById("email").value.trim(),
+password:document.getElementById("password").value
+});
+
+if(error){
+msg.textContent="Login failed: "+error.message;
+btn.disabled=false;
+return;
+}
+
+window.location.href="dashboard.html";
+});
+</script>
+</body>
+</html>
